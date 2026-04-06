@@ -6,7 +6,7 @@
 
 > AI-powered learning coach that accelerates mastery through spaced repetition, personalized syllabi, and active practice.
 
-**Built for [Claude Code](https://claude.com/claude-code)** - Integrates AI coaching directly into your development environment.
+**Works with [Claude Code](https://claude.com/claude-code) and [OpenCode](https://opencode.ai)** - Integrates AI coaching directly into your development environment.
 
 ## Why Learn FASTER?
 
@@ -47,23 +47,32 @@ uv tool install learn-faster --from git+https://github.com/cheukyin175/learn-fas
 Then in any project directory, simply run:
 
 ```bash
-learn-faster
+# For Claude Code
+learn-faster --agent claude
+
+# For OpenCode
+learn-faster --agent opencode
 ```
 
-This will auto-initialize on first run and launch Claude Code with FASTER coaching mode.
+This will auto-initialize on first run and launch the chosen AI agent with FASTER coaching mode.
 
 ### Option 2: One-Time Use
 
 Run directly without installation:
 
 ```bash
-uvx --from git+https://github.com/cheukyin175/learn-faster-kit.git learn-faster
+# For Claude Code
+uvx --from git+https://github.com/cheukyin175/learn-faster-kit.git learn-faster --agent claude
+
+# For OpenCode
+uvx --from git+https://github.com/cheukyin175/learn-faster-kit.git learn-faster --agent opencode
 ```
 
 ### What Gets Installed
 
-On first run, learn-faster creates:
+On first run, learn-faster creates agent-specific config directories:
 
+**For Claude Code (`--agent claude`):**
 ```
 your-project/
 ├── .claude/
@@ -74,7 +83,7 @@ your-project/
 │   │   └── progress.md
 │   └── settings.local.json
 ├── .learning/
-│   ├── config.json (tracks initialization)
+│   ├── config.json
 │   ├── scripts/
 │   │   ├── init_learning.py
 │   │   ├── log_progress.py
@@ -82,6 +91,27 @@ your-project/
 │   │   └── generate_syllabus.py
 │   └── references/faster_framework.md
 └── CLAUDE.md
+```
+
+**For OpenCode (`--agent opencode`):**
+```
+your-project/
+├── .opencode/
+│   ├── agents/practice-creator.md
+│   ├── commands/
+│   │   ├── learn.md
+│   │   ├── review.md
+│   │   └── progress.md
+├── opencode.json
+├── .learning/
+│   ├── config.json
+│   ├── scripts/
+│   │   ├── init_learning.py
+│   │   ├── log_progress.py
+│   │   ├── review_scheduler.py
+│   │   └── generate_syllabus.py
+│   └── references/faster_framework.md
+└── INSTRUCTIONS.md
 ```
 
 ## Quick Start
@@ -96,14 +126,20 @@ your-project/
 
     ```bash
     cd your-learning-project
-    learn-faster
+    learn-faster --agent claude    # or --agent opencode
     ```
 
     First run will:
 
     - Prompt you to select a learning mode
     - Initialize the project structure
-    - Launch Claude Code with FASTER coaching enabled
+    - Launch the AI agent with FASTER coaching enabled
+
+    After initialization, the `--agent` flag is optional (stored in config):
+
+    ```bash
+    learn-faster    # uses the agent from initialization
+    ```
 
 3. **Start learning**
 
@@ -119,8 +155,8 @@ The "T" in FASTER—teaching to retain—is the key differentiator. Here's how i
 
 ```bash
 mkdir learn-go && cd learn-go
-learn-faster                    # Select "Balanced" mode
-/learn "Go error handling"      # In Claude Code
+learn-faster --agent claude     # Select "Balanced" mode
+/learn "Go error handling"      # In your AI agent
 ```
 
 ```
@@ -135,7 +171,7 @@ You:   So when you wrap an error with fmt.Errorf and %w, you're adding
        context like "failed to open config" while keeping the original
        error inside. Then errors.Is can still match the root cause.
 
-Coach: ✅ Great explanation! You nailed the key insight—wrapped errors
+Coach: Great explanation! You nailed the key insight—wrapped errors
        preserve the chain for inspection. Adding "error wrapping" to
        your review schedule. First review tomorrow.
 ```
@@ -146,13 +182,15 @@ Coach: ✅ Great explanation! You nailed the key insight—wrapped errors
 
 ### CLI Commands
 
--   `learn-faster` - Launch Claude Code with FASTER coaching (auto-initializes on first run)
--   `learn-faster init` - Force re-initialization or switch learning modes
+-   `learn-faster --agent <claude|opencode>` - Launch AI agent with FASTER coaching (auto-initializes on first run)
+-   `learn-faster init --agent <claude|opencode>` - Force re-initialization or switch learning modes
 -   `learn-faster version` - Show current version
 
-### Claude Code Slash Commands
+The `--agent` flag is required on first run. After initialization, it's optional (the stored agent is used).
 
-Once Claude Code is running, use these commands:
+### Slash Commands
+
+Once your AI agent is running, use these commands:
 
 -   `/learn [topic]` - Start or continue learning a topic with personalized syllabus
 -   `/review` - Spaced repetition review session for topics you've learned
@@ -198,7 +236,7 @@ Learn FASTER is ideal for:
 ## Requirements
 
 -   Python 3.12+
--   [Claude Code](https://claude.com/claude-code)
+-   [Claude Code](https://claude.com/claude-code) or [OpenCode](https://opencode.ai)
 -   [uv](https://docs.astral.sh/uv/) package manager
 
 ## Contributing

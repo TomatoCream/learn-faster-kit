@@ -13,16 +13,19 @@ This project uses the FASTER framework:
 
 ## Directory Structure
 
+The agent config directory is either `.claude/` (for Claude Code) or `.opencode/` (for OpenCode).
+The instructions file is either `CLAUDE.md` or `INSTRUCTIONS.md` depending on the agent.
+
 ```
 project-root/
-├── CLAUDE.md (this file)
-├── .claude/
+├── CLAUDE.md or INSTRUCTIONS.md (this file)
+├── .claude/ or .opencode/
 │   ├── agents/practice-creator.md
 │   ├── commands/
 │   │   ├── learn.md
 │   │   ├── review.md
 │   │   └── progress.md
-│   └── settings.local.json
+│   └── settings.local.json or opencode.json
 └── .learning/
     ├── scripts/
     │   ├── init_learning.py
