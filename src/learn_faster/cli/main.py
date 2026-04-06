@@ -21,6 +21,7 @@ from pathlib import Path
 
 VALID_AGENTS = ("claude", "opencode")
 
+
 # ANSI color codes
 class Colors:
     RESET = "\033[0m"
@@ -159,7 +160,7 @@ def transform_agent_for_opencode(src_path: Path, dest_path: Path) -> None:
 
     # Extract frontmatter key-value pairs
     fm_lines = lines[1:frontmatter_end]
-    body = "\n".join(lines[frontmatter_end + 1:])
+    body = "\n".join(lines[frontmatter_end + 1 :])
 
     fm = {}
     for line in fm_lines:
@@ -199,6 +200,7 @@ def transform_agent_for_opencode(src_path: Path, dest_path: Path) -> None:
 
 # --- Claude Code specifics ---
 
+
 def create_or_update_claude_settings(claude_dir: Path) -> None:
     """Create or update .claude/settings.local.json."""
     settings_file = claude_dir / "settings.local.json"
@@ -211,7 +213,7 @@ def create_or_update_claude_settings(claude_dir: Path) -> None:
                 "Read(.learning/**)",
                 "Write(.learning/**)",
                 "Write(**/*.md)",
-                "Read(**/*.md)"
+                "Read(**/*.md)",
             ],
             "deny": [
                 "Bash(rm:*)",
@@ -219,12 +221,12 @@ def create_or_update_claude_settings(claude_dir: Path) -> None:
                 "Read(.env)",
                 "Read(.env.*)",
                 "Write(.env)",
-                "Write(.env.*)"
-            ]
+                "Write(.env.*)",
+            ],
         },
         "companyAnnouncements": [
-            "Learn FASTER is active! Use /learn \"Topic\" to start learning",
-        ]
+            'Learn FASTER is active! Use /learn "Topic" to start learning',
+        ],
     }
 
     if settings_file.exists():
@@ -260,21 +262,15 @@ def create_or_update_claude_settings(claude_dir: Path) -> None:
 
 # --- OpenCode specifics ---
 
+
 def create_or_update_opencode_config(cwd: Path) -> None:
     """Create or update opencode.json in the project root."""
     config_file = cwd / "opencode.json"
 
     default_config = {
         "$schema": "https://opencode.ai/config.json",
-        "instructions": [
-            "INSTRUCTIONS.md"
-        ],
-        "permission": {
-            "read": "allow",
-            "write": "allow",
-            "edit": "allow",
-            "bash": "ask"
-        }
+        "instructions": ["INSTRUCTIONS.md"],
+        "permission": {"*": "allow"},
     }
 
     if config_file.exists():
@@ -303,6 +299,7 @@ def create_or_update_opencode_config(cwd: Path) -> None:
 
 
 # --- Common ---
+
 
 def check_initialization() -> bool:
     """Check if project has been initialized."""
@@ -345,36 +342,57 @@ def init_project(agent: str) -> None:
     # Ask for learning mode selection
     learning_mode_question = [
         inquirer.List(
-            'mode',
+            "mode",
             message="Choose your learning mode",
             choices=[
-                ('Balanced         - Mix of theory, practice, and application', 'balanced'),
-                ('Exam-Oriented   - Printable exam papers, practice tests, and certification prep', 'exam'),
-                ('Theory-Focused   - Deep conceptual understanding and mental models', 'theory'),
-                ('Practical        - Build projects immediately, learn by doing', 'practical'),
-                ('Programming      - Learn programming through building projects', 'programming'),
+                (
+                    "Balanced         - Mix of theory, practice, and application",
+                    "balanced",
+                ),
+                (
+                    "Exam-Oriented   - Printable exam papers, practice tests, and certification prep",
+                    "exam",
+                ),
+                (
+                    "Theory-Focused   - Deep conceptual understanding and mental models",
+                    "theory",
+                ),
+                (
+                    "Practical        - Build projects immediately, learn by doing",
+                    "practical",
+                ),
+                (
+                    "Programming      - Learn programming through building projects",
+                    "programming",
+                ),
             ],
-            default='balanced',
+            default="balanced",
         ),
     ]
 
     mode_answer = inquirer.prompt(learning_mode_question)
-    learning_mode = mode_answer['mode'] if mode_answer else 'balanced'
+    learning_mode = mode_answer["mode"] if mode_answer else "balanced"
 
     mode_names = {
         "exam": "Exam-Oriented",
         "theory": "Theory-Focused",
         "practical": "Practical",
         "balanced": "Balanced",
-        "programming": "Programming"
+        "programming": "Programming",
     }
     print_success(f"Selected: {mode_names[learning_mode]} mode\n")
 
     # Ask about macOS Reminders (only on macOS)
     macos_reminders = False
     if platform.system() == "Darwin":
-        response = input(f"{Colors.CYAN}Enable macOS Reminders for review notifications? (y/n):{Colors.RESET} ").strip().lower()
-        macos_reminders = response in ['y', 'yes']
+        response = (
+            input(
+                f"{Colors.CYAN}Enable macOS Reminders for review notifications? (y/n):{Colors.RESET} "
+            )
+            .strip()
+            .lower()
+        )
+        macos_reminders = response in ["y", "yes"]
 
     # Create agent config directory structure
     config_dir_name = agent_config_dir_name(agent)
@@ -422,12 +440,14 @@ def init_project(agent: str) -> None:
         "initialized": True,
         "agent": agent,
         "learning_mode": learning_mode,
-        "macos_reminders_enabled": macos_reminders
+        "macos_reminders_enabled": macos_reminders,
     }
     config_path = learning_dir / "config.json"
     with open(config_path, "w") as f:
         json.dump(config, f, indent=2)
-    print_success(f"Created config.json (Agent: {display}, Mode: {mode_names[learning_mode]}, macOS Reminders: {'enabled' if macos_reminders else 'disabled'})")
+    print_success(
+        f"Created config.json (Agent: {display}, Mode: {mode_names[learning_mode]}, macOS Reminders: {'enabled' if macos_reminders else 'disabled'})"
+    )
 
     # Copy scripts
     scripts_dest = learning_dir / "scripts"
@@ -460,9 +480,15 @@ def init_project(agent: str) -> None:
     print(f"\n{Colors.GREEN}{Colors.BOLD}Initialization complete!{Colors.RESET}\n")
 
     print_header(f"Available commands in {display}:")
-    print(f"  {Colors.CYAN}/learn [topic]{Colors.RESET}    - Initialize or continue learning")
-    print(f"  {Colors.CYAN}/review{Colors.RESET}           - Spaced repetition review session")
-    print(f"  {Colors.CYAN}/progress{Colors.RESET}         - Show detailed progress report")
+    print(
+        f"  {Colors.CYAN}/learn [topic]{Colors.RESET}    - Initialize or continue learning"
+    )
+    print(
+        f"  {Colors.CYAN}/review{Colors.RESET}           - Spaced repetition review session"
+    )
+    print(
+        f"  {Colors.CYAN}/progress{Colors.RESET}         - Show detailed progress report"
+    )
     print()
 
 
@@ -483,7 +509,9 @@ def launch_coach(agent: str, auto_review: bool = False) -> None:
 
     # Get the path to the system prompt template
     templates_dir = Path(__file__).parent.parent / "templates"
-    system_prompt_path = templates_dir / "modes" / learning_mode / "system_prompts" / "learn-faster.md"
+    system_prompt_path = (
+        templates_dir / "modes" / learning_mode / "system_prompts" / "learn-faster.md"
+    )
 
     if not system_prompt_path.exists():
         print_error(f"Error: System prompt for '{learning_mode}' mode not found")
@@ -565,7 +593,9 @@ def parse_agent_arg(args: list[str]) -> tuple[str, list[str]]:
         sys.exit(1)
 
     if agent not in VALID_AGENTS:
-        print_error(f"Invalid agent: '{agent}'. Must be one of: {', '.join(VALID_AGENTS)}")
+        print_error(
+            f"Invalid agent: '{agent}'. Must be one of: {', '.join(VALID_AGENTS)}"
+        )
         sys.exit(1)
 
     return agent, remaining
@@ -578,19 +608,26 @@ def main() -> None:
     # Handle version and help before requiring --agent
     if len(raw_args) >= 1 and raw_args[0] in ("version", "--version"):
         from learn_faster import __version__
+
         print(f"learn-faster version {__version__}")
         return
 
     if len(raw_args) >= 1 and raw_args[0] in ("help", "--help", "-h"):
         print("Learn FASTER - Accelerate learning with FASTER framework\n")
         print("Usage:")
-        print("  learn-faster --agent <claude|opencode>           Auto-init and launch in coach mode")
-        print("  learn-faster init --agent <claude|opencode>      Force re-initialization")
+        print(
+            "  learn-faster --agent <claude|opencode>           Auto-init and launch in coach mode"
+        )
+        print(
+            "  learn-faster init --agent <claude|opencode>      Force re-initialization"
+        )
         print("  learn-faster version                             Show version")
         print()
         print("Options:")
         print("  --agent <claude|opencode>   Required. Choose AI agent backend.")
-        print("                              (Omit if already initialized - uses stored config)")
+        print(
+            "                              (Omit if already initialized - uses stored config)"
+        )
         print()
         print("For more info: https://github.com/cheukyin175/learn-faster-kit")
         return
@@ -623,8 +660,12 @@ def main() -> None:
         # Verify agent matches what was initialized
         stored = get_configured_agent()
         if stored and stored != agent:
-            print_warning(f"Project was initialized with {agent_display_name(stored)}, but --agent {agent} was given.")
-            print_warning(f"Using {agent_display_name(agent)} as requested. Re-run 'learn-faster init --agent {agent}' to switch fully.")
+            print_warning(
+                f"Project was initialized with {agent_display_name(stored)}, but --agent {agent} was given."
+            )
+            print_warning(
+                f"Using {agent_display_name(agent)} as requested. Re-run 'learn-faster init --agent {agent}' to switch fully."
+            )
 
         print_info(f"Launching {display} in learning coach mode...")
         print_dim("(Starting with /review to check for due reviews)\n")
